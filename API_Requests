@@ -1,0 +1,24 @@
+1. Create Blog Request :
+
+{
+    "Author": "Author Name",
+    "Content": "Contect of blog",
+    "Tags": ["tag1","tag2"],
+    "Title": "Title of blog"
+}
+
+2. Read Blog Request :
+
+{
+    "PostId": "9bb8e76a-8074-4894-9e6b-bb2da7e426cc"
+}
+
+3. Update Blog Request :
+
+{
+    "PostId": "9bb8e76a-8074-4894-9e6b-bb2da7e426cc",
+    "Title": "Title of blog 2",
+    "Tags": ["tag3", "tag4"],
+    "Author": "Author3",
+    "Content": "Content3"
+}
