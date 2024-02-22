@@ -22,3 +22,9 @@
     "Author": "Author3",
     "Content": "Content3"
 }
+
+4. Delete post request
+
+{
+    "PostId": "6f5acddb-b699-4ce4-8b38-eba6d12306d8"
+}

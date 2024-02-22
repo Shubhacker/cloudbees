@@ -29,10 +29,17 @@ message updatePostRequest{
     repeated string Tags =5;
 }
 
+message DeletePostRequest{
+    string PostId =1;
+}
 
+message DeletePostResponse{
+    string IsDeleted =1;
+}
 
 service Invoicer {
     rpc CreatePost(CreatePostRequest) returns (PostResponse);
     rpc ReadPost(ReadPostRequest) returns (PostResponse);
     rpc UpdatePost(updatePostRequest) returns (PostResponse);
+    rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
 }
