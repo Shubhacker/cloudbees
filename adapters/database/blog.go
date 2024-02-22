@@ -1,12 +1,15 @@
 package database
 
 import (
+	"cloudbees/adapters/util"
 	cloudbees "cloudbees/invoicer"
 	"encoding/json"
 	"log"
 
 	"github.com/jmoiron/sqlx"
 )
+
+// All DB call specific to Blog tables we will add here
 
 func AddBlog(i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 	var inputArgs []interface{}
@@ -17,7 +20,7 @@ func AddBlog(i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 	inputArgs = append(inputArgs, i.Title)
 	inputArgs = append(inputArgs, i.Content)
 	dt, err3 := json.Marshal(i.Tags)
-	if err3 != nil {
+	if util.Error("json.Marshal", err3) {
 		log.Println(err3.Error())
 	}
 	inputArgs = append(inputArgs, i.Author)
@@ -25,8 +28,7 @@ func AddBlog(i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 
 	sqlQuery = sqlx.Rebind(sqlx.DOLLAR, sqlQuery)
 	err := db.QueryRow(sqlQuery, inputArgs...).Scan(&blogData.PostId, &blogData.Content, &blogData.Author, &tags, &blogData.PublicationDate, &blogData.Title)
-	if err != nil {
-		log.Println(err)
+	if util.Error("AddBlog", err) {
 		return &cloudbees.PostResponse{}, err
 	}
 
@@ -41,8 +43,8 @@ func ReadPost(i *cloudbees.ReadPostRequest) (*cloudbees.PostResponse, error) {
 	sqlQuery := `select blogid, title, "content", author, publicationDate, tags from public.blog where blogid = $1`
 
 	err := db.QueryRow(sqlQuery, i.PostId).Scan(&response.PostId, &response.Title, &response.Content, &response.Author, &response.PublicationDate, &tags)
-	if err != nil {
-		log.Println(err.Error())
+	if util.Error("ReadPost", err) {
+		return &cloudbees.PostResponse{}, err
 	}
 	response.Tags = append(response.Tags, tags)
 
@@ -95,8 +97,8 @@ func UpdatePost(i *cloudbees.UpdatePostRequest) (*cloudbees.PostResponse, error)
 		sqlQuery += sqlVal
 		isFirst = false
 		dt, err3 := json.Marshal(i.Tags)
-		if err3 != nil {
-			log.Println(err3.Error())
+		if util.Error("json.Marshal", err3) {
+			return &cloudbees.PostResponse{}, err3
 		}
 		inputArgs = append(inputArgs, dt)
 	}
@@ -106,8 +108,7 @@ func UpdatePost(i *cloudbees.UpdatePostRequest) (*cloudbees.PostResponse, error)
 	sqlQuery = sqlx.Rebind(sqlx.DOLLAR, sqlQuery)
 
 	err := db.QueryRow(sqlQuery, inputArgs...).Scan(&response.PostId, &response.Content, &response.Author, &tags, &response.PublicationDate, &response.Title)
-	if err != nil {
-		log.Println(err.Error())
+	if util.Error("UpdatePost", err) {
 		return &cloudbees.PostResponse{}, err
 	}
 	response.Tags = append(response.Tags, tags)
@@ -121,8 +122,7 @@ func DeletePost(i *cloudbees.DeletePostRequest) (*cloudbees.DeletePostResponse, 
 	sqlQuery := `delete from public.blog where blogid = $1 returning blogid`
 
 	err := db.QueryRow(sqlQuery, i.PostId).Scan(&blogId)
-	if err != nil {
-		log.Println(err.Error())
+	if util.Error("DeletePost", err) {
 		response.IsDeleted = "Failed to delete the post !"
 		return &response, err
 	}

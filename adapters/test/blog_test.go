@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+// Unit test cases for blog CRUD operations
+
 func TestCreateBlog(t *testing.T) {
 	log.Println("Insert API Test")
 	database.DBConnectTest()

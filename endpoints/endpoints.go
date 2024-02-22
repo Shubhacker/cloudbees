@@ -14,9 +14,10 @@ type MyInvoicerServer struct {
 	cloudbees.UnimplementedInvoicerServer
 }
 
+// Call all logic methods and validation
+
 func (s MyInvoicerServer) CreatePost(ctx context.Context, i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 	now := time.Now()
-	// We will call all logic methods and validation
 	blogData, err := logic.CreatePost(ctx, i)
 	if err != nil {
 		return blogData, err
