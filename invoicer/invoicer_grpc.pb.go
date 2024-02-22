@@ -25,6 +25,7 @@ type InvoicerClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*PostResponse, error)
 	ReadPost(ctx context.Context, in *ReadPostRequest, opts ...grpc.CallOption) (*PostResponse, error)
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*PostResponse, error)
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error)
 }
 
 type invoicerClient struct {
@@ -62,6 +63,15 @@ func (c *invoicerClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, 
 	return out, nil
 }
 
+func (c *invoicerClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
+	out := new(DeletePostResponse)
+	err := c.cc.Invoke(ctx, "/Invoicer/DeletePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InvoicerServer is the server API for Invoicer service.
 // All implementations must embed UnimplementedInvoicerServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type InvoicerServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*PostResponse, error)
 	ReadPost(context.Context, *ReadPostRequest) (*PostResponse, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*PostResponse, error)
+	DeletePost(context.Context, *DeletePostRequest) (*DeletePostResponse, error)
 	mustEmbedUnimplementedInvoicerServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedInvoicerServer) ReadPost(context.Context, *ReadPostRequest) (
 }
 func (UnimplementedInvoicerServer) UpdatePost(context.Context, *UpdatePostRequest) (*PostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+}
+func (UnimplementedInvoicerServer) DeletePost(context.Context, *DeletePostRequest) (*DeletePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
 }
 func (UnimplementedInvoicerServer) mustEmbedUnimplementedInvoicerServer() {}
 
@@ -152,6 +166,24 @@ func _Invoicer_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Invoicer_DeletePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvoicerServer).DeletePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Invoicer/DeletePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvoicerServer).DeletePost(ctx, req.(*DeletePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Invoicer_ServiceDesc is the grpc.ServiceDesc for Invoicer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var Invoicer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePost",
 			Handler:    _Invoicer_UpdatePost_Handler,
+		},
+		{
+			MethodName: "DeletePost",
+			Handler:    _Invoicer_DeletePost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
