@@ -24,8 +24,7 @@ func AddBlog(i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 	inputArgs = append(inputArgs, string(dt))
 
 	sqlQuery = sqlx.Rebind(sqlx.DOLLAR, sqlQuery)
-
-	err := db.QueryRow(sqlQuery, inputArgs...).Scan(&blogData.PostId, &blogData.Content, &blogData.Author, &tags, &blogData.PublicationDate, blogData.Title)
+	err := db.QueryRow(sqlQuery, inputArgs...).Scan(&blogData.PostId, &blogData.Content, &blogData.Author, &tags, &blogData.PublicationDate, &blogData.Title)
 	if err != nil {
 		log.Println(err)
 		return &cloudbees.PostResponse{}, err
@@ -112,6 +111,22 @@ func UpdatePost(i *cloudbees.UpdatePostRequest) (*cloudbees.PostResponse, error)
 		return &cloudbees.PostResponse{}, err
 	}
 	response.Tags = append(response.Tags, tags)
+
+	return &response, nil
+}
+
+func DeletePost(i *cloudbees.DeletePostRequest) (*cloudbees.DeletePostResponse, error) {
+	var response cloudbees.DeletePostResponse
+	var blogId string
+	sqlQuery := `delete from public.blog where blogid = $1 returning blogid`
+
+	err := db.QueryRow(sqlQuery, i.PostId).Scan(&blogId)
+	if err != nil {
+		log.Println(err.Error())
+		response.IsDeleted = "Failed to delete the post !"
+		return &response, err
+	}
+	response.IsDeleted = "Post deleted successfully !"
 
 	return &response, nil
 }
