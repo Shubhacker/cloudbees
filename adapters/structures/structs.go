@@ -1,5 +1,7 @@
 package structures
 
+// All struct we will add here
+
 type DBConnect struct {
 	DBName     string
 	DBUser     string

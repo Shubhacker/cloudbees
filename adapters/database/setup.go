@@ -10,6 +10,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// DB connetions
+
 var db *sql.DB
 
 func DBConnect() {
@@ -20,15 +22,15 @@ func DBConnect() {
 		"password=%s dbname=%s sslmode=disable", DBVal.DBHost, DBVal.DBPort, DBVal.DBUser, DBVal.DBPassword, DBVal.DBName)
 
 	db, err = sql.Open("postgres", sqlVal)
-	if err != nil {
-		log.Println(err.Error())
+	if util.Error("DBConnect", err) {
+		return
 	}
 
 	// defer db.Close()
 
 	err = db.Ping()
-	if err != nil {
-		log.Println(err.Error())
+	if util.Error("db.Ping", err) {
+		return
 	}
 
 	log.Println("DB Connected !")
