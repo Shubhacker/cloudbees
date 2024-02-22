@@ -1,10 +1,9 @@
 package endpoints
 
 import (
-	"cloudbees/adapters/database"
+	"cloudbees/adapters/logic"
 	cloudbees "cloudbees/invoicer"
 	"context"
-	"errors"
 	"log"
 	"time"
 
@@ -17,7 +16,8 @@ type MyInvoicerServer struct {
 
 func (s MyInvoicerServer) CreatePost(ctx context.Context, i *cloudbees.CreatePostRequest) (*cloudbees.PostResponse, error) {
 	now := time.Now()
-	blogData, err := database.AddBlog(i)
+	// We will call all logic methods and validation
+	blogData, err := logic.CreatePost(ctx, i)
 	if err != nil {
 		return blogData, err
 	}
@@ -27,10 +27,7 @@ func (s MyInvoicerServer) CreatePost(ctx context.Context, i *cloudbees.CreatePos
 
 func (s MyInvoicerServer) ReadPost(ctx context.Context, i *cloudbees.ReadPostRequest) (*cloudbees.PostResponse, error) {
 	now := time.Now()
-	if i.PostId == "" {
-		return &cloudbees.PostResponse{}, errors.New("Provide PostId")
-	}
-	res, err := database.ReadPost(i)
+	res, err := logic.ReadPost(ctx, i)
 	if err != nil {
 		return &cloudbees.PostResponse{}, err
 	}
@@ -40,14 +37,22 @@ func (s MyInvoicerServer) ReadPost(ctx context.Context, i *cloudbees.ReadPostReq
 
 func (s MyInvoicerServer) UpdatePost(ctx context.Context, i *cloudbees.UpdatePostRequest) (*cloudbees.PostResponse, error) {
 	now := time.Now()
-	if i.PostId == "" {
-		return &cloudbees.PostResponse{}, errors.New("Provide PostId")
-	}
-	res, err := database.UpdatePost(i)
+	res, err := logic.UpdatePost(ctx, i)
 	if err != nil {
 		return &cloudbees.PostResponse{}, nil
 	}
 	log.Println("UpdatePost API time took :", time.Since(now))
+	return res, nil
+}
+
+func (s MyInvoicerServer) DeletePost(ctx context.Context, i *cloudbees.DeletePostRequest) (*cloudbees.DeletePostResponse, error) {
+	now := time.Now()
+	res, err := logic.DeletePost(ctx, i)
+	if err != nil {
+		log.Println(err.Error())
+		return res, err
+	}
+	log.Println("DeletePost API time took :", time.Since(now))
 	return res, nil
 }
 
